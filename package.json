@@ -10,7 +10,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "glob-fs": "^0.1.7",
     "google-auth-library": "^1.4.0",
     "googleapis": "^30.0.0"
   }

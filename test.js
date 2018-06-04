@@ -13,9 +13,11 @@ describe('youtube dl', () => {
             if (x !== filename) return done("expecting m4a file")
             if (!fs.existsSync(filename)) return done("expecting file to be written");
             done();            
+            
+            if (fs.existsSync(filename)) fs.unlinkSync(filename);
 
         }).catch(err => {
-            done("error", err);
+            done(err);
         });
 
     }).timeout(10000);
