@@ -1,4 +1,5 @@
 var yt = require('./lib/youtubedl');
+var search = require('./lib/youtubeSearch');
 var fs = require('fs');
 
 describe('youtube dl', () => {
@@ -23,3 +24,14 @@ describe('youtube dl', () => {
     }).timeout(10000);
 });
 
+describe('youtube search', () => {
+
+    it('searches youtube', done => {
+        search("rocket guns blazin").then(x => {
+            if (!x) return done("no results")
+            if (!x.id ) return done("no id")
+            done();
+        });
+    });
+
+});

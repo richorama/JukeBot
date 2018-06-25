@@ -1,12 +1,16 @@
 var youtubeDl = require('./lib/youtubedl');
+var search = require('./lib/youtubeSearch');
 var player = require('./lib/player');
 
 var playQueue = [];
 var playing = false;
 
-async function enqueue(fileId){
-    var filename = await youtubeDl(fileId);
-    playQueue.push({filename : filename});
+async function enqueue(term){
+    var searchResult = await search(term);
+    if (!searchResult) return; // no file
+    var filename = await youtubeDl(searchResult.id);
+    searchResult.filename = filename;
+    playQueue.push(searchResult);
     play();
 }
 
