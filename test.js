@@ -3,7 +3,7 @@ var search = require('./lib/youtubeSearch');
 var player = require('./lib/player');
 var fs = require('fs');
 
-const filename = 'qBNmY7S0BG8.m4a';
+const filename = 'qBNmY7S0BG8.mp3';
 
 describe('youtube dl', () => {
     
@@ -13,7 +13,7 @@ describe('youtube dl', () => {
 
         yt('qBNmY7S0BG8').then(x => {
 
-            if (x !== filename) return done("expecting m4a file")
+            if (x !== filename) return done("expecting mp3 file")
             if (!fs.existsSync(filename)) return done("expecting file to be written");
             done();            
             
