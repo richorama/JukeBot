@@ -11,17 +11,17 @@ async function enqueue(term){
     var filename = await youtubeDl(searchResult.id);
     searchResult.filename = filename;
     playQueue.push(searchResult);
-    play();
+    await play();
 }
 
-function play(){
+async function play(){
     if (playing) return;
     if (!playQueue.length) return;
 
     var item = playQueue.pop();
 
-    player(item.filename, () => {
-        playing = false;
-        setImmediate(play);
-    });
+    await player(item.filename);
+    
+    playing = false;
+    setImmediate(play);
 }
