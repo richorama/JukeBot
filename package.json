@@ -4,12 +4,14 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "start": "node app.js",
     "test": "mocha"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
+    "botkit": "0.2.2",
     "google-auth-library": "^1.4.0",
     "googleapis": "^30.0.0",
     "localtunnel": "^1.9.0",
