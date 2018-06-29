@@ -75,23 +75,24 @@ controller.on('rtm_close', function (bot) {
 // BEGIN EDITING HERE!
 
 controller.on('bot_channel_join', function (bot, message) {
-    bot.reply(message, "I'm here!")
+    bot.reply(message, "I HAVE ARRIVED!")
 });
 
-controller.hears('hello', 'direct_message', function (bot, message) {
+controller.hears('hello', ['direct_message', 'ambient'], function (bot, message) {
     bot.reply(message, 'Hello!');
 });
 
-controller.hears("^play .*", 'direct_message', function(bot, message){
+controller.hears("^play .*", ['direct_message', 'ambient'], function(bot, message){
     var searchString = message.text.toLowerCase().replace('play ', '');
     search(searchString).then(result => {
         if (!result){
             return bot.reply(message, `Sorry, I couldn't find anything`);
         }
 
-        bot.reply(message, `Queuing ${result.title}`);
+        bot.reply(message, `Downloading ${result.title}\n${result.thumbnails.medium.url}`);
 
         youtubeDl(result.id).then(filename => {
+            bot.reply(message, `Download complete, queueing ${result.title} (${playQueue.length} items in the queue)`);
             console.log(`downloaded ${result.title} ${filename}`);
             result.filename = filename;
             playQueue.push(result);

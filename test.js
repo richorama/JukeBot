@@ -37,7 +37,7 @@ describe('player', () => {
 describe('youtube search', () => {
 
     it('searches youtube', done => {
-        search("rocket guns blazin").then(x => {
+        search("daft punk").then(x => {
             if (!x) return done("no results")
             if (!x.id ) return done("no id")
             done();
