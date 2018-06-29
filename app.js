@@ -1,6 +1,7 @@
 var youtubeDl = require('./lib/youtubedl');
 var search = require('./lib/youtubeSearch');
 var player = require('./lib/player');
+var skip = player.skip;
 var app = require('./lib/apps');
 var settings = require('./client_secret.json');
 
@@ -74,6 +75,9 @@ controller.on('rtm_close', function (bot) {
  */
 // BEGIN EDITING HERE!
 
+
+var thisBot = null;
+
 controller.on('bot_channel_join', function (bot, message) {
     bot.reply(message, "I HAVE ARRIVED!")
 });
@@ -82,7 +86,23 @@ controller.hears('hello', ['direct_message', 'ambient'], function (bot, message)
     bot.reply(message, 'Hello!');
 });
 
+controller.hears('skip', ['direct_message', 'ambient'], function (bot, message) {
+    skip();
+    bot.reply(message, 'Skipping');
+});
+
+controller.hears(["current", "playing", "what"], ['direct_message', 'ambient'],function (bot, message) {
+    if (null == currentlyPlaying) return bot.reply(message, "There is nothing playing at the moment");
+    bot.reply(message, `Currently playing ${result.title}\n${result.thumbnails.medium.url}`);
+});
+
+controller.hears(["queue", "list"], ['direct_message', 'ambient'],function (bot, message) {
+    if (!playQueue.length) return bot.reply(message, "There is nothing in the queue");
+    bot.reply(message, `Currently queued:\n ${playQueue.map(x => x.title).join("\n")}`);
+});
+
 controller.hears("^play .*", ['direct_message', 'ambient'], function(bot, message){
+    thisBot = bot;
     var searchString = message.text.toLowerCase().replace('play ', '');
     search(searchString).then(result => {
         if (!result){
@@ -111,13 +131,18 @@ async function enqueue(term){
     await play();
 }
 */
+
+var currentlyPlaying = null;
+
 async function play(){
     if (playing) return;
     if (!playQueue.length) return;
 
     var item = playQueue.pop();
 
+    currentlyPlaying = item;
     await player(item.filename);
+    currentlyPlaying = null;
     
     playing = false;
     setImmediate(play);
