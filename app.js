@@ -1,31 +1,21 @@
 var youtubeDl = require('./lib/youtubedl');
 var search = require('./lib/youtubeSearch');
 var player = require('./lib/player');
-var localtunnel = require('localtunnel');
 var app = require('./lib/apps');
 var settings = require('./client_secret.json');
-
-process.env.PORT = settings.port;
 
 var playQueue = [];
 var playing = false;
 
-
-if (settings.subdomain){
+if (process.argv.indexOf('register') >= 0){
+    var localtunnel = require('localtunnel');
     localtunnel(parseInt(settings.port), { subdomain:settings.subdomain }, (err,tunnel) => {
         if (err) return console.log("error", err);
-        console.log(tunnel);
+        console.log(`visit ${tunnel.url}/login to register this bot`);
         tunnel.on("close", () => console.log("TUNNEL CLOSED") );
         tunnel.on("error", err => console.log("TUNNEL ERROR", err) );
     });
 }
-
-/*** */
-
-
-/**
- * A Bot for Slack!
- */
 
 /**
  * Define a function for initiating a conversation on installation
@@ -58,10 +48,7 @@ var config = {
  * Are being run as an app or a custom integration? The initialization will differ, depending
  */
 
-console.log(settings)
 var controller = app.configure(settings.port, settings.clientId, settings.clientSecret, config, onInstallation);
- 
-
 
 /**
  * A demonstration for how to handle websocket events. In this case, just log when we have and have not
@@ -95,8 +82,25 @@ controller.hears('hello', 'direct_message', function (bot, message) {
     bot.reply(message, 'Hello!');
 });
 
+controller.hears("^play .*", 'direct_message', function(bot, message){
+    var searchString = message.text.toLowerCase().replace('play ', '');
+    search(searchString).then(result => {
+        if (!result){
+            return bot.reply(message, `Sorry, I couldn't find anything`);
+        }
 
-/*** */
+        bot.reply(message, `Queuing ${result.title}`);
+
+        youtubeDl(result.id).then(filename => {
+            console.log(`downloaded ${result.title} ${filename}`);
+            result.filename = filename;
+            playQueue.push(result);
+            play().then(() => {});
+        });
+    });
+});
+
+/*
 async function enqueue(term){
     var searchResult = await search(term);
     if (!searchResult) return; // no file
@@ -105,7 +109,7 @@ async function enqueue(term){
     playQueue.push(searchResult);
     await play();
 }
-
+*/
 async function play(){
     if (playing) return;
     if (!playQueue.length) return;
