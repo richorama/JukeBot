@@ -93,8 +93,7 @@ controller.hears('skip', ['direct_message', 'ambient'], function (bot, message) 
 
 controller.hears(["current", "playing", "what"], ['direct_message', 'ambient'],function (bot, message) {
     if (null == currentlyPlaying) return bot.reply(message, "There is nothing playing at the moment");
-    bot.reply(message, `:musical_note: Currently playing ${currentlyPlaying.title}`);
-    bot.reply(message, {attachments : [{image_url : currentlyPlaying.thumbnails.medium.url}]});
+    bot.reply(message, `:musical_note: Currently playing ${currentlyPlaying.title}\n${currentlyPlaying.thumbnails.medium.url}`);
 });
 
 controller.hears(["queue", "list"], ['direct_message', 'ambient'],function (bot, message) {
@@ -110,8 +109,7 @@ controller.hears("^play .*", ['direct_message', 'ambient'], function(bot, messag
             return bot.reply(message, `Sorry, I couldn't find anything`);
         }
 
-        bot.reply(message, `:arrow_down_small: Downloading ${result.title}`);
-        bot.reply(message, {attachments : [{image_url : result.thumbnails.medium.url}]});
+        bot.reply(message, `:arrow_down_small: Downloading ${result.title}\n${result.thumbnails.medium.url}`);
 
         youtubeDl(result.id).then(filename => {
             bot.reply(message, `:heavy_check_mark: Download complete, queueing ${result.title} (${playQueue.length} items in the queue)`);
