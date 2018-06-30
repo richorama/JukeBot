@@ -93,7 +93,7 @@ controller.hears('skip', ['direct_message', 'ambient'], function (bot, message) 
 
 controller.hears(["current", "playing", "what"], ['direct_message', 'ambient'],function (bot, message) {
     if (null == currentlyPlaying) return bot.reply(message, "There is nothing playing at the moment");
-    bot.reply(message, `Currently playing ${result.title}\n${result.thumbnails.medium.url}`);
+    bot.reply(message, `Currently playing ${currentlyPlaying.title}\n${currentlyPlaying.thumbnails.medium.url}`);
 });
 
 controller.hears(["queue", "list"], ['direct_message', 'ambient'],function (bot, message) {
