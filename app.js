@@ -93,12 +93,12 @@ controller.hears('skip', ['direct_message', 'ambient'], function (bot, message) 
 
 controller.hears(["current", "playing", "what"], ['direct_message', 'ambient'],function (bot, message) {
     if (null == currentlyPlaying) return bot.reply(message, "There is nothing playing at the moment");
-    bot.reply(message, `Currently playing ${currentlyPlaying.title}\n${currentlyPlaying.thumbnails.medium.url}`);
+    bot.reply(message, `:musical_note: Currently playing ${currentlyPlaying.title}\n${currentlyPlaying.thumbnails.medium.url}`);
 });
 
 controller.hears(["queue", "list"], ['direct_message', 'ambient'],function (bot, message) {
     if (!playQueue.length) return bot.reply(message, "There is nothing in the queue");
-    bot.reply(message, `Currently queued:\n ${playQueue.map(x => ` :musical_note: ${x.title}`).join("\n")}`);
+    bot.reply(message, `Currently queued:\n ${playQueue.map(x => `:musical_note: ${x.title}`).join("\n")}`);
 });
 
 controller.hears("^play .*", ['direct_message', 'ambient'], function(bot, message){
