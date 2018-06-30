@@ -88,7 +88,7 @@ controller.hears('hello', ['direct_message', 'ambient'], function (bot, message)
 
 controller.hears('skip', ['direct_message', 'ambient'], function (bot, message) {
     skip();
-    bot.reply(message, 'Skipping');
+    bot.reply(message, ':fast_forward: Skipping');
 });
 
 controller.hears(["current", "playing", "what"], ['direct_message', 'ambient'],function (bot, message) {
