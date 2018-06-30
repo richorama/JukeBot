@@ -138,7 +138,7 @@ async function play(){
     if (playing) return;
     if (!playQueue.length) return;
 
-    var item = playQueue.pop();
+    var item = playQueue.shift();
 
     playing = true;
 
