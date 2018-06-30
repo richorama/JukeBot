@@ -98,7 +98,7 @@ controller.hears(["current", "playing", "what"], ['direct_message', 'ambient'],f
 
 controller.hears(["queue", "list"], ['direct_message', 'ambient'],function (bot, message) {
     if (!playQueue.length) return bot.reply(message, "There is nothing in the queue");
-    bot.reply(message, `Currently queued:\n ${playQueue.map(x => x.title).join("\n")}`);
+    bot.reply(message, `Currently queued:\n ${playQueue.map(x => ` :musical_note: ${x.title}`).join("\n")}`);
 });
 
 controller.hears("^play .*", ['direct_message', 'ambient'], function(bot, message){
@@ -109,10 +109,10 @@ controller.hears("^play .*", ['direct_message', 'ambient'], function(bot, messag
             return bot.reply(message, `Sorry, I couldn't find anything`);
         }
 
-        bot.reply(message, `Downloading ${result.title}\n${result.thumbnails.medium.url}`);
+        bot.reply(message, `:arrow_down_small: Downloading ${result.title}\n${result.thumbnails.medium.url}`);
 
         youtubeDl(result.id).then(filename => {
-            bot.reply(message, `Download complete, queueing ${result.title} (${playQueue.length} items in the queue)`);
+            bot.reply(message, `:heavy_check_mark: Download complete, queueing ${result.title} (${playQueue.length} items in the queue)`);
             console.log(`downloaded ${result.title} ${filename}`);
             result.filename = filename;
             playQueue.push(result);
