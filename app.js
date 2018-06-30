@@ -140,6 +140,8 @@ async function play(){
 
     var item = playQueue.pop();
 
+    playing = true;
+
     currentlyPlaying = item;
     await player(item.filename);
     currentlyPlaying = null;
