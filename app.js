@@ -7,6 +7,7 @@ var settings = require('./client_secret.json');
 
 var playQueue = [];
 var playing = false;
+var downloads = {};
 
 if (process.argv.indexOf('register') >= 0){
     var localtunnel = require('localtunnel');
@@ -97,8 +98,11 @@ controller.hears(["current", "playing", "what"], ['direct_message', 'ambient'],f
 });
 
 controller.hears(["queue", "list"], ['direct_message', 'ambient'],function (bot, message) {
-    if (!playQueue.length) return bot.reply(message, "There is nothing in the queue");
-    bot.reply(message, `Currently queued:\n ${playQueue.map(x => `:musical_note: ${x.title}`).join("\n")}`);
+    var allTracks = [];
+    playQueue.forEach(x => allTracks.push(`:musical_note: ${x.title}`));
+    Object.keys(downloads).map(x => downloads[x]).forEach(x => allTracks.push(`:arrow_down_small: ${x.title}`))
+    if (!allTracks.length) return bot.reply(message, "There is nothing in the queue");
+    bot.reply(message, `Currently queued:\n ${allTracks.join("\n")}`);
 });
 
 controller.hears("^play .*", ['direct_message', 'ambient'], function(bot, message){
@@ -111,15 +115,18 @@ controller.hears("^play .*", ['direct_message', 'ambient'], function(bot, messag
 
         bot.reply(message, `:arrow_down_small: Downloading ${result.title}\n${result.thumbnails.medium.url}`);
 
+        downloads[result.id] = result;
+
         youtubeDl(result.id).then(filename => {
             bot.reply(message, `:heavy_check_mark: Download complete, queueing ${result.title} (${playQueue.length} items in the queue)`);
             console.log(`downloaded ${result.title} ${filename}`);
             result.filename = filename;
+            delete downloads[result.id];
             playQueue.push(result);
             play().then(() => {});
         }).catch(() => {
+            delete downloads[result.id];
             bot.reply(message, `Error, unable to download ${result.title}`);
-        
         });
     });
 });
