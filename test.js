@@ -29,7 +29,7 @@ describe('youtube dl', () => {
 describe('player', () => {
     it ('plays an audio file', done => {
 
-        player(filename).then(done);
+        player.play(filename).then(done);
 
     });
 });

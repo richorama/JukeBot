@@ -1,7 +1,6 @@
 var youtubeDl = require('./lib/youtubedl');
 var search = require('./lib/youtubeSearch');
 var player = require('./lib/player');
-var skip = player.skip;
 var app = require('./lib/apps');
 var settings = require('./client_secret.json');
 
@@ -88,8 +87,18 @@ controller.hears('hello', ['direct_message', 'ambient'], function (bot, message)
 });
 
 controller.hears('skip', ['direct_message', 'ambient'], function (bot, message) {
-    skip();
+    player.skip();
     bot.reply(message, ':fast_forward: Skipping');
+});
+
+controller.hears(['pause', 'resume'], ['direct_message', 'ambient'], function (bot, message) {
+    player.pauseResume();
+    bot.reply(message, ':back_right_pointing_triangle_with_double_vertical_bar: pause / resuming');
+});
+
+controller.hears(['rewind'], ['direct_message', 'ambient'], function (bot, message) {
+    player.rewind();
+    bot.reply(message, ':rewind: WHO WANTS THE REWIND?');
 });
 
 controller.hears(["current", "playing", "what"], ['direct_message', 'ambient'],function (bot, message) {
@@ -153,7 +162,7 @@ async function play(){
     playing = true;
 
     currentlyPlaying = item;
-    await player(item.filename);
+    await player.play(item.filename);
     currentlyPlaying = null;
     
     playing = false;
