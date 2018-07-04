@@ -109,7 +109,7 @@ controller.hears(["current", "playing", "what"], ['direct_message', 'ambient'],f
 controller.hears(["queue", "list"], ['direct_message', 'ambient'],function (bot, message) {
     var allTracks = [];
     playQueue.forEach(x => allTracks.push(`:musical_note: ${x.title}`));
-    Object.keys(downloads).map(x => downloads[x]).forEach(x => allTracks.push(`:arrow_down_small: ${x.title}`))
+    Object.keys(downloads).map(x => downloads[x]).forEach(x => allTracks.push(`:floppy_disk: ${x.title}`))
     if (!allTracks.length) return bot.reply(message, "There is nothing in the queue");
     bot.reply(message, `Currently queued:\n ${allTracks.join("\n")}`);
 });
@@ -122,7 +122,7 @@ controller.hears("^play .*", ['direct_message', 'ambient'], function(bot, messag
             return bot.reply(message, `Sorry, I couldn't find anything`);
         }
 
-        bot.reply(message, `:arrow_down_small: Downloading ${result.title}\n${result.thumbnails.medium.url}`);
+        bot.reply(message, `:floppy_disk: Downloading ${result.title}\n${result.thumbnails.medium.url}`);
 
         downloads[result.id] = result;
 
