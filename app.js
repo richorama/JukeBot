@@ -61,22 +61,34 @@ var controller = app.configure(settings.port, settings.clientId, settings.client
  */
 // Handle events related to the websocket connection to Slack
 controller.on('rtm_open', function (bot) {
-    console.log('** The RTM api just connected!');
+    thisBot = bot;
+    console.log('CONNECTED');
+    getChannels(bot);
 });
+var fullChannelList = [];
 
-controller.on('rtm_close', function (bot) {
-    console.log('** The RTM api just closed');
-    // you may want to attempt to re-open
-});
+function getChannels(bot){
+    bot.api.channels.list({}, function (err, response) {
+        fullChannelList = [];
+        if (response.hasOwnProperty('channels') && response.ok) {
+            var total = response.channels.length;
+            for (var i = 0; i < total; i++) {
+                var channel = response.channels[i];
+                if (channel.name === "random") continue;
+                fullChannelList.push({name: channel.name, id: channel.id});
+            }
+        }
+        console.log("got channel list");
+        console.log(fullChannelList);
+    });
+}
 
+var thisBot;
 
 /**
  * Core bot logic goes here!
  */
 // BEGIN EDITING HERE!
-
-
-var thisBot = null;
 
 controller.on('bot_channel_join', function (bot, message) {
     bot.reply(message, "I HAVE ARRIVED!")
@@ -125,10 +137,11 @@ controller.hears("^play .*", ['direct_message', 'ambient'], function(bot, messag
         bot.reply(message, `:floppy_disk: Downloading ${result.title}\n${result.thumbnails.medium.url}`);
 
         downloads[result.id] = result;
-
+        
+        console.log(`downloading ${result.title} ${result.id}`);
         youtubeDl(result.id).then(filename => {
             bot.reply(message, `:heavy_check_mark: Download complete, queueing ${result.title} (${playQueue.length} items in the queue)`);
-            console.log(`downloaded ${result.title} ${filename}`);
+            console.log(`download complete ${result.title} ${filename}`);
             result.filename = filename;
             delete downloads[result.id];
             playQueue.push(result);
@@ -139,17 +152,6 @@ controller.hears("^play .*", ['direct_message', 'ambient'], function(bot, messag
         });
     });
 });
-
-/*
-async function enqueue(term){
-    var searchResult = await search(term);
-    if (!searchResult) return; // no file
-    var filename = await youtubeDl(searchResult.id);
-    searchResult.filename = filename;
-    playQueue.push(searchResult);
-    await play();
-}
-*/
 
 var currentlyPlaying = null;
 
@@ -162,7 +164,21 @@ async function play(){
     playing = true;
 
     currentlyPlaying = item;
+    try{
+        fullChannelList.forEach(channel => {
+            thisBot.say({
+                text:`:musical_note: playing ${item.title}`,
+                channel:channel.id
+            });
+        });
+    } catch (e){
+        console.log("error announcing next item");
+        console.log(e);
+    }
+    
+    console.log(`start playing ${item.title} ${item.filename}`);
     await player.play(item.filename);
+    console.log(`finished playing ${item.title} ${item.filename}`);
     currentlyPlaying = null;
     
     playing = false;
