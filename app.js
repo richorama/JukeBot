@@ -134,7 +134,7 @@ controller.hears("^play .*", ['direct_message', 'ambient'], function(bot, messag
             return bot.reply(message, `Sorry, I couldn't find anything`);
         }
 
-        bot.reply(message, `:floppy_disk: Downloading ${result.title}\n${result.thumbnails.medium.url}`);
+        bot.reply(message, `:floppy_disk: Downloading ${result.title}`);
 
         downloads[result.id] = result;
         
@@ -167,7 +167,7 @@ async function play(){
     try{
         fullChannelList.forEach(channel => {
             thisBot.say({
-                text:`:musical_note: playing ${item.title}`,
+                text:`:musical_note: playing ${item.title}\n${item.thumbnails.medium.url}`,
                 channel:channel.id
             });
         });
