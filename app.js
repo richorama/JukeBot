@@ -153,6 +153,20 @@ controller.hears("^play .*", ['direct_message', 'ambient'], function(bot, messag
     });
 });
 
+
+controller.hears("help", ['direct_message', 'ambient'],function (bot, message) {
+    var textLine = ["Hi! :waves: Type the following into this chat to control the music",
+        "`play XXX` to play a tune",
+        "`current` to find out what is currently playing",
+        "`list` to list the tunes queued up",
+        "`skip` to move onto the next tune",
+        "`rewind` to rewind to the start of the current tune",
+        "`pause` / `resume` to pause the music"
+    ];    
+    bot.reply(message, text.join("\n"));
+});
+
+
 var currentlyPlaying = null;
 
 async function play(){
