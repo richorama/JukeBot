@@ -63,7 +63,7 @@ var controller = app.configure(settings.port, settings.clientId, settings.client
 controller.on('rtm_open', function (bot) {
     thisBot = bot;
     console.log('CONNECTED');
-    getChannels(bot);
+    //getChannels(bot);
 });
 var fullChannelList = [];
 
