@@ -62,8 +62,7 @@ var controller = app.configure(settings.port, settings.clientId, settings.client
 // Handle events related to the websocket connection to Slack
 controller.on('rtm_open', function (bot) {
     thisBot = bot;
-    console.log('CONNECTED');
-    //getChannels(bot);
+    getChannels(bot);
 });
 var fullChannelList = [];
 
@@ -73,13 +72,13 @@ function getChannels(bot){
         if (response.hasOwnProperty('channels') && response.ok) {
             var total = response.channels.length;
             for (var i = 0; i < total; i++) {
+                // only consider channels in the config file
                 var channel = response.channels[i];
-                if (channel.name === "random") continue;
+                if (!settings[channel.name]) continue;
+                console.log(`using ${channel.name} channel for announcements`);
                 fullChannelList.push({name: channel.name, id: channel.id});
             }
         }
-        console.log("got channel list");
-        console.log(fullChannelList);
     });
 }
 
@@ -105,7 +104,7 @@ controller.hears('skip', ['direct_message', 'ambient'], function (bot, message) 
 
 controller.hears(['pause', 'resume'], ['direct_message', 'ambient'], function (bot, message) {
     player.pauseResume();
-    bot.reply(message, ':back_right_pointing_triangle_with_double_vertical_bar: pause / resuming');
+    bot.reply(message, ':black_right_pointing_triangle_with_double_vertical_bar: pause / resuming');
 });
 
 controller.hears(['rewind'], ['direct_message', 'ambient'], function (bot, message) {
