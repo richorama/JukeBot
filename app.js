@@ -1,15 +1,15 @@
-var youtubeDl = require('./lib/youtubedl');
-var search = require('./lib/youtubeSearch');
-var player = require('./lib/player');
-var app = require('./lib/apps');
-var settings = require('./client_secret.json');
+const youtubeDl = require('./lib/youtubedl');
+const search = require('./lib/youtubeSearch');
+const player = require('./lib/player');
+const app = require('./lib/apps');
+const settings = require('./client_secret.json');
 
 var playQueue = [];
 var playing = false;
 var downloads = {};
 
 if (process.argv.indexOf('register') >= 0){
-    var localtunnel = require('localtunnel');
+    const localtunnel = require('localtunnel');
     localtunnel(parseInt(settings.port), { subdomain:settings.subdomain }, (err,tunnel) => {
         if (err) return console.log("error", err);
         console.log(`visit ${tunnel.url}/login to register this bot`);
@@ -49,7 +49,7 @@ var config = {
  * Are being run as an app or a custom integration? The initialization will differ, depending
  */
 
-var controller = app.configure(settings.port, settings.clientId, settings.clientSecret, config, onInstallation);
+const controller = app.configure(settings.port, settings.clientId, settings.clientSecret, config, onInstallation);
 
 /**
  * A demonstration for how to handle websocket events. In this case, just log when we have and have not
