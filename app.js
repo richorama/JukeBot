@@ -127,8 +127,9 @@ controller.hears(["queue", "list"], ['direct_message', 'ambient'],function (bot,
 
 controller.hears("^play .*", ['direct_message', 'ambient'], function(bot, message){
     thisBot = bot;
-    var searchString = message.text.toLowerCase().replace('play ', '');
-    search(searchString).then(result => {
+    const searchString = message.text.toLowerCase().replace('play ', '');
+    search(searchString).then(results => {
+        const result = results[0];
         if (!result){
             return bot.reply(message, `Sorry, I couldn't find anything`);
         }
@@ -153,6 +154,18 @@ controller.hears("^play .*", ['direct_message', 'ambient'], function(bot, messag
 });
 
 
+controller.hears("^search .*", ['direct_message', 'ambient'], function(bot, message){
+    thisBot = bot;
+    var searchString = message.text.toLowerCase().replace('search ', '');
+    search(searchString).then(results => {
+        bot.reply(message, `here is what I found:\n ${results.map((x, index) => `${index + 1}. ${x.title}`).join('\n')}`);
+
+    }).catch(() => {
+        bot.reply(message, `Error, unable to search for ${searchString}`);
+    });
+
+});
+
 controller.hears("help", ['direct_message', 'ambient'],function (bot, message) {
     var text = ["Hi! :wave: Type the following into this chat to control the music",
         "`play Rick Astley` to play a tune",
@@ -160,7 +173,8 @@ controller.hears("help", ['direct_message', 'ambient'],function (bot, message) {
         "`list` to list the tunes queued up",
         "`skip` to move onto the next tune",
         "`rewind` to rewind to the start of the current tune",
-        "`pause` / `resume` to pause the music"
+        "`pause` / `resume` to pause the music",
+        "`search Rick Astley` shows the top results for your search term"
     ];    
     bot.reply(message, text.join("\n"));
 });

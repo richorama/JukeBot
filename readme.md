@@ -72,6 +72,8 @@ node app
 
 `pause` / `resume` to pause the music
 
+`search XXX` to search for a tune
+
 # License
 
 MIT

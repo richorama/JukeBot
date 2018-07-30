@@ -38,8 +38,8 @@ describe('youtube search', () => {
 
     it('searches youtube', done => {
         search("daft punk").then(x => {
-            if (!x) return done("no results")
-            if (!x.id ) return done("no id")
+            if (0 === x.length) return done("no results")
+            if (!x[0].id ) return done("no id")
             done();
         });
     });
