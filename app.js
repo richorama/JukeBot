@@ -83,18 +83,32 @@ function getChannels(bot){
 }
 
 var thisBot;
-
+var userCache = {};
 /**
  * Core bot logic goes here!
  */
 // BEGIN EDITING HERE!
+
+function getUsername(bot, userId, cb){
+    if (userCache[userId]) return cb(userCache[userId]);
+    bot.api.users.info({user:userId},function(err,response) {
+        if (err) return cb("");
+        var name = response.user.real_name || response.user.name;
+        userCache[userId] = name;
+        cb(name)
+    });
+}
+
 
 controller.on('bot_channel_join', function (bot, message) {
     bot.reply(message, "I HAVE ARRIVED!")
 });
 
 controller.hears('hello', ['direct_message', 'ambient'], function (bot, message) {
-    bot.reply(message, 'Hello!');
+    getUsername(bot, message.user, function(name){
+        bot.reply(message, `Hello ${name}!`);
+    })
+    
 });
 
 controller.hears('skip', ['direct_message', 'ambient'], function (bot, message) {
@@ -114,15 +128,15 @@ controller.hears(['rewind'], ['direct_message', 'ambient'], function (bot, messa
 
 controller.hears(["current", "playing", "what"], ['direct_message', 'ambient'],function (bot, message) {
     if (null == currentlyPlaying) return bot.reply(message, "There is nothing playing at the moment");
-    bot.reply(message, `:musical_note: Currently playing ${currentlyPlaying.title}\n${currentlyPlaying.thumbnails.medium.url}`);
+    bot.reply(message, `:musical_note: Currently playing ${currentlyPlaying.title} as requested by ${currentlyPlaying.requested_by}\n${currentlyPlaying.thumbnails.medium.url}`);
 });
 
 controller.hears(["queue", "list"], ['direct_message', 'ambient'],function (bot, message) {
     var allTracks = [];
-    playQueue.forEach(x => allTracks.push(`:musical_note: ${x.title}`));
-    Object.keys(downloads).map(x => downloads[x]).forEach(x => allTracks.push(`:floppy_disk: ${x.title}`))
+    playQueue.forEach(x => allTracks.push(`:musical_note: ${x.title}  (${x.requested_by})`));
+    Object.keys(downloads).map(x => downloads[x]).forEach(x => allTracks.push(`:floppy_disk: ${x.title} (${x.requested_by})`))
     if (!allTracks.length) return bot.reply(message, "There is nothing in the queue");
-    bot.reply(message, `Currently queued:\n ${allTracks.join("\n")}`);
+    bot.reply(message, `Currently queued:\n${allTracks.join("\n")}`);
 });
 
 controller.hears("^play .*", ['direct_message', 'ambient'], function(bot, message){
@@ -134,22 +148,28 @@ controller.hears("^play .*", ['direct_message', 'ambient'], function(bot, messag
             return bot.reply(message, `Sorry, I couldn't find anything`);
         }
 
-        bot.reply(message, `:floppy_disk: Downloading ${result.title}`);
+        getUsername(bot, message.user, name => {
 
-        downloads[result.id] = result;
-        
-        console.log(`downloading ${result.title} ${result.id}`);
-        youtubeDl(result.id).then(filename => {
-            bot.reply(message, `:heavy_check_mark: Download complete, queueing ${result.title} (${playQueue.length} items in the queue)`);
-            console.log(`download complete ${result.title} ${filename}`);
-            result.filename = filename;
-            delete downloads[result.id];
-            playQueue.push(result);
-            play().then(() => {});
-        }).catch(() => {
-            delete downloads[result.id];
-            bot.reply(message, `Error, unable to download ${result.title}`);
+            result.requested_by = name;
+
+            bot.reply(message, `:floppy_disk: Downloading ${result.title}`);
+
+            downloads[result.id] = result;
+            
+            console.log(`downloading ${result.title} ${result.id}`);
+            youtubeDl(result.id).then(filename => {
+                bot.reply(message, `:heavy_check_mark: Download complete, queueing ${result.title} (${playQueue.length} items in the queue)`);
+                console.log(`download complete ${result.title} ${filename}`);
+                result.filename = filename;
+                delete downloads[result.id];
+                playQueue.push(result);
+                play().then(() => {});
+            }).catch(() => {
+                delete downloads[result.id];
+                bot.reply(message, `Error, unable to download ${result.title}`);
+            });
         });
+        
     });
 });
 
