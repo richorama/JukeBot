@@ -3,6 +3,7 @@ const search = require('./lib/youtubeSearch');
 const player = require('./lib/player');
 const app = require('./lib/apps');
 const settings = require('./client_secret.json');
+const stato = require('./lib/stato');
 
 var playQueue = [];
 var playing = false;
@@ -105,14 +106,24 @@ controller.on('bot_channel_join', function (bot, message) {
 });
 
 controller.hears('hello', ['direct_message', 'ambient'], function (bot, message) {
-    getUsername(bot, message.user, function(name){
+    getUsername(bot, message.user, name => {
         bot.reply(message, `Hello ${name}!`);
     })
     
 });
 
 controller.hears('skip', ['direct_message', 'ambient'], function (bot, message) {
+
+    if (currentlyPlaying){
+        var recordSkipForThisTrack = currentlyPlaying;
+        getUsername(bot, message.user, name => {
+            recordSkipForThisTrack.skipped_by = name;
+            stato.recordSkip(recordSkipForThisTrack)
+        });
+    }
+
     player.skip();
+
     bot.reply(message, ':fast_forward: Skipping');
 });
 
@@ -200,6 +211,12 @@ controller.hears("help", ['direct_message', 'ambient'],function (bot, message) {
 });
 
 
+controller.hears("stats", ['direct_message', 'ambient'],function (bot, message) {
+    var summary = stato.getSummary();
+    bot.reply(message, summary);
+});
+
+
 var currentlyPlaying = null;
 
 async function play(){
@@ -209,6 +226,8 @@ async function play(){
     var item = playQueue.shift();
 
     playing = true;
+
+    stato.recordPlay(item);
 
     currentlyPlaying = item;
     try{

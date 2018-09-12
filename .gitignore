@@ -2,6 +2,7 @@ node_modules/
 db_slack_bot_a/
 *.m4a
 *.mp3
+*.part
 credentials.txt
 client_secret.json
 quickstart.js
