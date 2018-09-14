@@ -204,8 +204,8 @@ controller.hears("help", ['direct_message', 'ambient'],function (bot, message) {
         "`list` to list the tunes queued up",
         "`skip` to move onto the next tune",
         "`rewind` to rewind to the start of the current tune",
-        "`pause` / `resume` to pause the music",
-        "`search Rick Astley` shows the top results for your search term"
+        "`search Rick Astley` shows the top results for your search term",
+        "`stats` will show you some usage statistics"
     ];    
     bot.reply(message, text.join("\n"));
 });
