@@ -13,7 +13,7 @@
   "dependencies": {
     "botkit": "^0.6.20",
     "google-auth-library": "^1.4.0",
-    "googleapis": "^30.0.0",
+    "googleapis": "^39.1.0",
     "hoek": "^5.0.3",
     "localtunnel": "^1.9.1",
     "youtube-search": "^1.1.1",
